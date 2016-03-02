@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Processing Template</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.13/p5.js"></script>
+    <script>
+        var barrier1;
+        var circleX;
+        var circleY;
+        var gameScore;
+        var endGame = false
+        var circleYSpeed = 10;
+        var snowFlakes = [];
+
+        function setup() {
+            createCanvas(800, 600)
+            gameScore = 0
+            circleX = 50
+            circleY = 250
+            barrier1 = new Barrier()
+        }
+
+        function draw() {
+            stroke(0)
+            text("Press enter to move", 100, 250);
+            circleY += circleYSpeed;
+            background(48, 139, 200);
+
+            barrier1.move()
+            barrier1.display()
+
+
+            snowFlakes.push(new SnowFlake());
+            for (var i = 0; i < snowFlakes.length; i++) {
+                snowFlakes[i].move();
+                snowFlakes[i].display();
+                if (snowFlakes[i].x < 0) {
+                    snowFlakes.splice(0, 1);
+                }
+            }
+            fill(0, 255, 0)
+            textSize(30)
+            text("Score: " + gameScore, 25, 25)
+
+            drawCircle()
+            circleY = constrain(circleY, 0, height);
+            gameOver()
+        }
+
+        function keyPressed() {
+            if (keyCode == ENTER) {
+                circleYSpeed *= -1;
+            }
+
+        }
+
+        function drawCircle() {
+            fill(255, 0, 0)
+            noStroke()
+            ellipse(circleX, circleY, 50, 50)
+        }
+
+        function gameOver() {
+            if (endGame == true) {
+                fill(0)
+                textSize(32)
+                textAlign(CENTER)
+                text("You Lost", width / 2, height / 2)
+                text("Your Final Score is " + gameScore, width / 2, 50 + height / 2)
+                textAlign(LEFT)
+                noLoop()
+            }
+        }
+
+        function SnowFlake() {
+            this.x = random(width - 1, width);
+            this.y = random(-500, 600);
+            this.diameter = 7
+
+            this.move = function() {
+                this.x += -3;
+                this.y += random(-.2, 1);
+
+            }
+
+            this.display = function() {
+                fill(255);
+                noStroke()
+                ellipse(this.x, this.y, this.diameter, this.diameter);
+            }
+        }
+
+        function Barrier() {
+            this.x = width
+            this.y = 0
+            this.speed = 10
+            this.move = function() {
+                this.x -= this.speed
+                console.log("Barrier Speed: " + this.speed)
+            }
+            this.display = function() {
+                strokeWeight(10)
+                line(this.x, 0, this.x, this.y + 150)
+                line(this.x, this.y + 350, this.x, this.y + width)
+                    // if ball between the barriers
+                if (circleX == this.x) {
+                    if (circleY > this.y + 150 && circleY < this.y + 350) {
+                        gameScore++
+                    }
+                    else {
+                        endGame = true
+                    }
+                }
+                if (this.x < 0) {
+                    this.x = width
+                    this.y = random(-150, 300)
+                        // this.speed += .5
+                        // this.speed = constrain(this.speed, 10, 15)
+                }
+            }
+
+        }
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>
